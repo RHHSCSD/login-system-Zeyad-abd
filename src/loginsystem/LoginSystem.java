@@ -9,12 +9,4 @@ package loginsystem;
  * @author michael.roy-diclemen
  */
 public class LoginSystem {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-    }
-    
 }
