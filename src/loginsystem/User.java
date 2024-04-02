@@ -40,5 +40,8 @@ public class User {
     public String getTempCode(){
         return tempCode;
     }
+    public String toString(String delim){
+        String output = username+delim+password+delim+email+delim+name+delim+tempCode;
+    }
 
 } 

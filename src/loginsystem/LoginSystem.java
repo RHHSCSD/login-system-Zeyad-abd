@@ -9,4 +9,14 @@ package loginsystem;
  * @author michael.roy-diclemen
  */
 public class LoginSystem {
+    
+    public User[] userLists;
+    
+    public void saveUser(User newUser){
+        
+    }
+    public void loadUsers(){}
+    public boolean isUniqueUser(){
+        return false;
+    }
 }
