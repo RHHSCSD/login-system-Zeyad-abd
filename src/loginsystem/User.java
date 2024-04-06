@@ -14,14 +14,14 @@ public class User {
     private String password;
     private String email;
     private String name;
-    private String dateBirth;
+    private String tempCode;
 
-    public User(String username, String password, String email, String name, String dateBirth){
+    public User(String username, String password, String email, String name, String tempCode){
         this.username = username;
         this.password = password;
         this.email = email;
         this.name = name;
-        this.dateBirth = dateBirth;
+        this.tempCode = tempCode;
 
     }
     
@@ -37,11 +37,11 @@ public class User {
     public String getName(){
         return name;
     }
-    public String getdateBirth(){
-        return dateBirth;
+    public String getTempCode(){
+        return tempCode;
     }
     public String toString(String delim){
-        String output = username+delim+password+delim+email+delim+name+delim+dateBirth;
+        String output = username+delim+password+delim+email+delim+name+delim+tempCode;
         return output;
     }
 
