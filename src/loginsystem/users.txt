@@ -1,0 +1,7 @@
+testUser;password123;test@example.com;Test User;123456
+testUser;password123;test@example.com;Test User;123456
+testUser;password123;test@example.com;Test User;123456
+testUser;password123;test@example.com;Test User;123456
+testUser;password123;test@example.com;Test User;123456
+testUser;password123;test@example.com;Test User;123456
+testUser;password123;test@example.com;Test User;123456
