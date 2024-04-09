@@ -1,5 +1,5 @@
 package loginsystem;
-                     
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,16 +12,21 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Random;
 
 /**
- *
- * @author zeyad
+ * This class implements a basic login system.
+ * It allows users to register, login, and performs password strength checks.
  */
 public class LoginSystem {
     
     private User[] userLists;
     private Set<String> badPasswords;
-       
+    
+    /**
+     * Saves user information to a file.
+     * @param user The user to be saved.
+     */
     private void saveUser(User user){
         try {
             // Specify the directory path where you want to create the file
@@ -45,6 +50,10 @@ public class LoginSystem {
             e.printStackTrace();
         }
     }
+    
+    /**
+     * Loads user information from a file.
+     */
     private void loadUsers() {
         List<User> userList = new ArrayList<>();
 
@@ -72,6 +81,12 @@ public class LoginSystem {
         // Convert the userList to an array
         userLists = userList.toArray(new User[0]);
     }
+    
+    /**
+     * Checks if the given user is unique based on username and email.
+     * @param user The user to be checked.
+     * @return True if the user is unique, false otherwise.
+     */
     private boolean isUniqueUser(User user) {
         // Load users if userLists is not initialized
         if (userLists == null) {
@@ -88,6 +103,13 @@ public class LoginSystem {
         
         return true; // Username and email are unique
     }
+    
+    /**
+     * Encrypts the given password using MD5 hashing algorithm.
+     * @param password The password to be encrypted.
+     * @return The encrypted password.
+     * @throws NoSuchAlgorithmException If the specified algorithm is not available.
+     */
     private String encryptPassword(String password) throws NoSuchAlgorithmException {
         // java helper class to perform encryption
         MessageDigest md = MessageDigest.getInstance("MD5");
@@ -102,6 +124,10 @@ public class LoginSystem {
         }
         return encryptedPassword.toString();
     }
+    
+    /**
+     * Loads a set of bad passwords from a file.
+     */
     private void loadBadPasswords() {
         badPasswords = new HashSet<>();
         try (BufferedReader br = new BufferedReader(new FileReader("src/loginsystem/badpasswords.txt"))) {
@@ -113,9 +139,15 @@ public class LoginSystem {
             e.printStackTrace();
         } 
     }
+    
+    /**
+     * Checks if the given password is strong.
+     * @param password The password to be checked.
+     * @return True if the password is strong, false otherwise.
+     */
     private boolean isStrongPassword(String password) {
         loadBadPasswords();
-                // Check length
+        // Check length
         if (password.length() < 5) {
             return false;
         }
@@ -152,6 +184,119 @@ public class LoginSystem {
         // Password meets all criteria
         return true;
     }
+    
+    /**
+     * Generates a temporary code.
+     * @return The generated temporary code.
+     */
+    private String generateTempCode() {
+        // Define characters to use in the temp code
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder tempCode = new StringBuilder();
+        
+        // Create a Random object
+        Random random = new Random();
+        
+        // Generate 4 random characters
+        for (int i = 0; i < 4; i++) {
+            // Generate a random index within the range of the characters string
+            int randomIndex = random.nextInt(characters.length());
+            
+            // Append the character at the random index to the temp code
+            tempCode.append(characters.charAt(randomIndex));
+        }
+        
+        return tempCode.toString();
+    }
+    
+    /**
+     * Registers a new user.
+     * @param email The email of the user.
+     * @param password The password of the user.
+     * @param username The username of the user.
+     * @param name The name of the user.
+     * @return A string indicating the registration status.
+     */
+    public String registerUser(String email, String password, String username, String name) {
+
+
+        String tempcode = generateTempCode();
+        // Create a new User object
+        User user = new User(username, password, email, name, tempcode);
+
+        // Check if the username is unique
+        if (!isUniqueUser(user)) {
+            return "Username or email already exists. Please choose a different one.";
+        }
+
+        // Check if the password is strong
+        if (!isStrongPassword(password)) {
+            return "Password is not strong enough. Please choose a stronger one.";
+        }
+
+        try {
+            // Encrypt the password
+            password = password+tempcode;
+            String encryptedPassword = encryptPassword(password);
+
+            // Update the User object with the encrypted password
+            user.setPassword(encryptedPassword);
+
+            // Save the User object to the file
+            saveUser(user);
+
+            return "User registered successfully.";
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("Error occurred while encrypting the password.");
+            e.printStackTrace();
+        }
+        return "Unknown error occurred during registration.";
+    }
+    
+    /**
+     * Logs in a user.
+     * @param username The username of the user.
+     * @param password The password of the user.
+     * @return A string indicating the login status.
+     */
+    public String loginUser(String username, String password) {
+        // Load users if userLists is not initialized
+        loadUsers();
+
+        User userToLogin = null;
+        // Finding the user with the given username
+        for (User existingUser : userLists) {
+            if (existingUser.getUsername().equals(username)) {
+                userToLogin = existingUser;
+                break;
+            }
+        }
+
+        // If user with given username is not found
+        if (userToLogin == null) {
+            return "User not found. Please check your username.";
+        }
+
+        try {
+            // Get the temp code for the user
+            String tempCode = userToLogin.getTempCode();
+
+            // Append the temp code to the entered password
+            password = password + tempCode;
+
+            // Encrypt the entered password
+            String encryptedPassword = encryptPassword(password);
+
+            // Compare the encrypted password with the stored password
+            if (userToLogin.getPassword().equals(encryptedPassword)) {
+                return "Login successful.";
+            } else {
+                System.out.println("Incorrect password.");
+            }
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("Error occurred while encrypting the password.");
+            e.printStackTrace();
+        }
+        return "Unknown error occurred during registration.";
+    }
 }
-
-
